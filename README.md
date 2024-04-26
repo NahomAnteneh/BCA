@@ -13,6 +13,10 @@ Bicbank is a simple banking application written in Java that allows users to per
 - **Transaction History**: View transaction history for each account.
 - **Settings**: Change username and password, delete accounts.
 
+## Folder Structure
+- `src` Folder to maintain sources.
+- `lib` Folder to maintain Dependencies.
+
 ## Prerequisites
 
 - Java Development Kit (JDK) installed on your system.
