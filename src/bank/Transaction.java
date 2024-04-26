@@ -32,4 +32,24 @@ public class Transaction {
     public String getTransactionId() {
         return transactionID;
     }
+
+    public int getFromAccountNo() {
+        return fromAccountNo;
+    }
+
+    public int getToAccountNo() {
+        return toAccountNo;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

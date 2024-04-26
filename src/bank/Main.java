@@ -2,6 +2,7 @@ package bank;
 
 import java.io.Console;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
@@ -159,14 +160,9 @@ public class Main {
                     // Display account no and balance
                     break;
                 case 6:
-                    Transaction[] transactions = customer.getTransactions();
-
-                    for (int i = 0; i < transactions.length; i++) {
-                        if (transactions[i].getTransactionId() == null) {
-                            System.out.println("Error: NullPointerException!");
-                            break;
-                        }
-                        System.out.println(transactions[i].getTransactionId());
+                    Transaction[] txn = customer.getTransactions();
+                    if (hasTransactions(txn)) {
+                        displayTransactions(customer);
                     }
                     break;
                 case 7:
@@ -268,5 +264,25 @@ public class Main {
                 break;
         }
         return accountType;
+    }
+
+    private static void displayTransactions(Customer customer) {
+        Transaction[] transactions = new Transaction[10];
+        transactions = customer.getTransactions();
+        int colWidth = 25;
+        Formatter formatter = new Formatter(System.out);
+        formatter.format("%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%n", "TransactionID", "FromAccountNo", "ToAccountsNo", "Amount", "Timestamp", "Description");
+
+        formatter.format("%-" + colWidth + "s%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "s%n", transactions[0].getTransactionId(), transactions[0].getFromAccountNo(), transactions[0].getToAccountNo(), transactions[0].getAmount(), transactions[0].getTimestamp(), transactions[0].getDescription());
+        formatter.close();
+    }
+
+    private static boolean hasTransactions(Transaction[] transactions) {
+        for (Transaction transaction : transactions) {
+            if (transaction != null) {
+                return true; // At least one non-null element found
+            }
+        }
+        return false; // No non-null elements found
     }
 }
