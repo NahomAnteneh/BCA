@@ -1,18 +1,16 @@
 package bank;
 import java.util.Date;
 
-public class Account {
+public abstract class Account {
     private int accountNo;
     private double balance;
-    private String accountType;
     private String accountCreatedDate;
     private static int generalAccountNo = 20160000;
 
-    public Account(double balance, String accountType) {
+    public Account(double balance) {
         Date date = new Date();
         this.accountNo = generalAccountNo++;
         this.balance = balance;
-        this.accountType = accountType;
         accountCreatedDate = date.toString();
     }
 
@@ -28,9 +26,7 @@ public class Account {
         balance += amount;
     }
 
-    public String getAccountType() {
-        return accountType;
-    }
+    public abstract String getAccountType();
 
     public String getCreationDate() {
         return accountCreatedDate;

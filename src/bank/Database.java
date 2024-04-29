@@ -35,8 +35,6 @@ public class Database {
         credentials.remove(username);
     }
 
-    // TODO: add removeTransaction method
-
     public static Customer getCustomer(String username) {
         return customers.get(username);
     }

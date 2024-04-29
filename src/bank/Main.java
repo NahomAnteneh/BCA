@@ -53,7 +53,7 @@ public class Main {
         char[] password;
         char[] confirmPasswd;
         float balance; // to be removed
-        String accountType;
+        int accountType;
 
         clearScreen();
         System.out.println("======== Signup Menu ========");
@@ -85,7 +85,6 @@ public class Main {
                 System.out.println("Passwords don't match, try again!");
             } else {
                 System.out.println("Passwords Match!");
-                enterToContinue();
                 break;
             }
         } while (true);
@@ -133,22 +132,26 @@ public class Main {
                     choice = chooseAccount(customer);
                     System.out.println("Please enter the account you want to transfer to.");
                     accNo = input.nextInt();
-                    if (!Database.accountExists(accNo)) {
+                    if (accNo == customer.getAccount(choice-1).getAccountNo()) {
+                        JOptionPane.showMessageDialog(null, "You cannot transfer to the same account!", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    } else if (Database.accountExists(accNo)) {
+                        System.out.println("Please enter the amount you want to transfer.");
+                        amount = input.nextDouble();
+                        if (customer.getAccount(choice-1).getBalance() < amount) {
+                            JOptionPane.showMessageDialog(null, "the amount you entered is more than your balance!", "Error", JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
+                        System.out.println("Enter description for the transfer.");
+                        description = input.next();
+                        customer.transferFunds((choice - 1), accNo, amount, description);
+                        System.out.println("Complete.");
+                        enterToContinue();
+                        break;
+                    } else {
                         JOptionPane.showMessageDialog(null, "The account number you entered doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
-                    System.out.println("Please enter the amount you want to transfer.");
-                    amount = input.nextDouble();
-                    if (customer.getAccount(choice-1).getBalance() < amount) {
-                        JOptionPane.showMessageDialog(null, "the amount you entered is more than your balance!", "Error", JOptionPane.ERROR_MESSAGE);
-                        break;
-                    }
-                    System.out.println("Enter description for the transfer.");
-                    description = input.next();
-                    customer.transferFunds((choice - 1), accNo, amount, description);
-                    System.out.println("Complete.");
-                    enterToContinue();
-                    break;
                 case 3:
                     System.out.println("This Service is yet to be implemented!");
                     enterToContinue();
@@ -158,12 +161,11 @@ public class Main {
                         JOptionPane.showMessageDialog(null, "You cannot create more than 5 accounts!", "Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
-                    String accountType = chooseAccountType();
+                    int accountType = chooseAccountType();
                     System.out.print("Enter Starting Balance: ");
                     double balance = input.nextDouble();
                     customer.createAccount(balance, accountType);
-                    // TODO: display the new account number
-                    System.out.println("Account Created Successfully!");
+                    System.out.println("Account Created Successfully! Your new Account's Account number is " + customer.getAccount(customer.getNoOfAccounts()-1).getAccountNo());
                     enterToContinue();
                     break;
                 case 5:
@@ -276,11 +278,25 @@ public class Main {
                         break;
                     }
                 case 3:
-                    // TODO: deletion doesn't work
-                    System.out.println("Which account you want to delete?");
-                    choice = chooseAccount(customer);
-                    customer.deleteAccount(customer.getAccount(choice - 1).getAccountNo());
-                    break;
+                    if (customer.getNoOfAccounts() > 1) {
+                        System.out.println("Which account you want to delete?");
+                        choice = chooseAccount(customer);
+                        int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to proceed?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+                        if (option == JOptionPane.YES_OPTION) {
+                            customer.deleteAccount(choice-1);
+                            System.out.println("Account Deleted Successfully.");
+                        } else if (option == JOptionPane.NO_OPTION) {
+                            System.out.println("Aborted...");
+                        } else {
+                            System.out.println("Canceled..");
+                        }
+                        enterToContinue();
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "You cannot delete your only account!", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
                 case 4:
                     return;
                 default:
@@ -319,30 +335,27 @@ public class Main {
         return choice;
     }
 
-    private static String chooseAccountType() {
-        String accountType;
+    private static int chooseAccountType() {
+        int accountType;
         int chooseType;
 
         System.out.println("1. Saving");
-        System.out.println("2. Current");
-        System.out.println("3. Cheking");
-        System.out.println("4. Womens");
+        System.out.println("2. Womens");
+        System.out.println("3. Current");
         System.out.print("Choose Type (default='Saving'): ");
         chooseType = input.nextInt();
         switch (chooseType) {
             case 1:
-                accountType = "Saving";
+                accountType = 1;
                 break;
             case 2:
-                accountType = "Current";
+                accountType = 2;
                 break;
             case 3: 
-                accountType = "Cheking";
+                accountType = 3;
                 break;
-            case 4:
-                accountType = "Womens";
             default:
-                accountType = "Saving";
+                accountType = 1;
                 break;
         }
         return accountType;

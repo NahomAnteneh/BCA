@@ -1,6 +1,7 @@
 package bank;
 
 import java.util.UUID;
+import java.util.Date;
 
 public class Transaction {
     private String transactionID;
@@ -11,11 +12,13 @@ public class Transaction {
     private String description;
 
     public Transaction(int fromAccountNo, int toAccountNo, double amount, String description) {
+        Date time = new Date();
         transactionID = generateTransactionId();
         this.fromAccountNo = fromAccountNo;
         this.toAccountNo = toAccountNo;
         this.amount = amount;
         this.description = description;
+        this.timestamp = time.toString();
     }
 
     private String generateTransactionId() {

@@ -3,7 +3,11 @@ package bank;
 import java.util.ArrayList;
 import java.util.Formatter;
 
-public class Customer {
+import bank.AccountType.Current;
+import bank.AccountType.Saving;
+import bank.AccountType.Womens;
+
+public class Customer implements Bank {
     private String username;
     private char[] password;
     private String firstName;
@@ -14,7 +18,7 @@ public class Customer {
     private int txnCounter = 0;
 
 
-    public Customer(String firstName, String lastName, double balance, String accountType, String username, char[] password) {
+    public Customer(String firstName, String lastName, double balance, int accountType, String username, char[] password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -25,15 +29,25 @@ public class Customer {
         Database.addToLogin(username, password);
     }
 
-    public void createAccount(double balance, String accountType) {
-        Account acc = new Account(balance, accountType);
-        // account[accountCounter] = acc;
-        account.add(acc);
-        // accounts[accountCounter] = acc.getAccountNo();
+    @Override
+    public void createAccount(double balance, int accountType) {
+        // Account acc = new Account(balance, accountType);
+        Account acc;
+        if (accountType == 1) {
+            acc = new Saving(balance);
+            account.add(acc);
+        } else if (accountType == 2) {
+            acc = new Womens(balance);
+            account.add(acc);
+        } else {
+            acc = new Current(balance);
+            account.add(acc);
+        }
         Database.addToAccounts(account.getLast());
         accountCounter++;
     }
 
+    @Override
     public void transferFunds(int accountIndex, int toAccountNo, double amount, String description) {
         account.get(accountIndex).updataBalance(-amount);
         Database.getAccount(toAccountNo).updataBalance(amount);
@@ -47,6 +61,7 @@ public class Customer {
         // }
     }
 
+    @Override
     public void changeUsername(String username) {
         Database.removeCustomer(this.username);
         Database.removeCredential(this.username);
@@ -56,14 +71,18 @@ public class Customer {
         Database.addToLogin(username, this.password);
     }
 
+    @Override
     public void changePassword(char[] password) {
         Database.removeCredential(username);
         this.password = password;
         Database.addToLogin(username, password);
     }
 
-    public void deleteAccount(int accountNo) {
-        Database.removeAccount(accountNo);
+    @Override
+    public void deleteAccount(int index) {
+        Database.removeAccount(account.get(index).getAccountNo());
+        account.remove(index);
+        accountCounter--;
     }
 
     public int getNoOfAccounts() {
@@ -114,7 +133,7 @@ public class Customer {
         Formatter formatter = new Formatter(System.out);
         formatter.format("%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%n", "Account No", "Balance", "Creation Date", "Account Type");
     
-        for (Account account : accounts) {
+        for (Account account : accounts) {      // this.accountType = accountType;
             formatter.format("%-" + colWidth + "s$%-" + colWidth + ".2f%-" + colWidth + "s%-" + colWidth + "s%n", account.getAccountNo(), account.getBalance(), account.getCreationDate(), account.getAccountType());
         }
     }    
