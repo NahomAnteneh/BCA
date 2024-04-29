@@ -32,7 +32,7 @@ public class Account {
         return accountType;
     }
 
-    public String getAccountCreationDate() {
+    public String getCreationDate() {
         return accountCreatedDate;
     }
 }

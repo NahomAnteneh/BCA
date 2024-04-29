@@ -23,6 +23,20 @@ public class Database {
         transactions.put(transactionID, transaction);
     }
 
+    public static void removeCustomer(String username) {
+        customers.remove(username);
+    }
+
+    public static void removeAccount(int accountNo) {
+        accounts.remove(accountNo);
+    }
+
+    public static void removeCredential(String username) {
+        credentials.remove(username);
+    }
+
+    // TODO: add removeTransaction method
+
     public static Customer getCustomer(String username) {
         return customers.get(username);
     }
@@ -31,12 +45,12 @@ public class Database {
         return accounts.get(accountNo);
     }
 
-    public static boolean usernameExists(String username) {
-        return credentials.containsKey(username);
-    }
-
     public static char[] getPassword(String username) {
         return credentials.get(username);
+    }
+
+    public static boolean usernameExists(String username) {
+        return credentials.containsKey(username);
     }
 
     public static boolean accountExists(int accountNo) {

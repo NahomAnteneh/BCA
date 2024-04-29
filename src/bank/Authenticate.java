@@ -11,10 +11,8 @@ public class Authenticate {
 
     }
 
-
     public static boolean authenticate(String username, char[] password) {
         char[] storedPassword = Database.getPassword(username);
         return Arrays.equals(storedPassword, password);
     }
-
 }

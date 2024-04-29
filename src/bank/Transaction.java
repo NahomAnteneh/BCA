@@ -4,12 +4,11 @@ import java.util.UUID;
 
 public class Transaction {
     private String transactionID;
-    private int fromAccountNo = 0;
+    private int fromAccountNo;
     private int toAccountNo;
     private double amount;
     private String timestamp;
     private String description;
-
 
     public Transaction(int fromAccountNo, int toAccountNo, double amount, String description) {
         transactionID = generateTransactionId();

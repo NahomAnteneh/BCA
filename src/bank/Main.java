@@ -1,46 +1,49 @@
 package bank;
 
-import java.io.Console;
-import java.util.Arrays;
-import java.util.Formatter;
-import java.util.Scanner;
-import javax.swing.JOptionPane;
+import java.io.Console; // for accepting hidden password
+import java.io.IOException; // for error handling in IO
+import java.util.ArrayList; // for dyanmic array
+import java.util.Arrays; // for array comparision
+import java.util.Scanner; // for input
+import javax.swing.JOptionPane; // for message box
 
 public class Main {
     private static Scanner input = new Scanner(System.in);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         mainMenu();
     }
 
     private static void mainMenu() {
         int choice;
-        clearScreen();
-        System.out.println("======== Welcome to Bicbank. just a Bank! ========");
-        System.out.println("Please choose the number you want to do.");
-        System.out.println("1. Sign Up.");
-        System.out.println("2. Login.");
-        System.out.println("3. About Us.");
-        System.out.println("4. Exit.");
-        System.out.print("Enter your choice: ");
-        choice = input.nextInt();
+        do {
+            clearScreen();
+            System.out.println("======== Welcome to Bicbank. just a Bank! ========");
+            System.out.println("Please choose the number you want to do.");
+            System.out.println("1. Sign Up.");
+            System.out.println("2. Login.");
+            System.out.println("3. About Us.");
+            System.out.println("4. Exit.");
+            System.out.print("Enter your choice: ");
+            choice = input.nextInt();
 
-        switch (choice) {
-            case 1:
-                signUpMenu();
-                break;
-            case 2:
-                loginMenu();
-                break;
-            case 3:
-                aboutMenu();
-                break;
-            case 4:
-                System.exit(0);
-            default:
-                System.out.println("Please Enter a Valid Choice (1 - 4)");
-                break;
-        }
+            switch (choice) {
+                case 1:
+                    signUpMenu();
+                    break;
+                case 2:
+                    loginMenu();
+                    break;
+                case 3:
+                    aboutMenu();
+                    break;
+                case 4:
+                    System.exit(0);
+                default:
+                    System.out.println("Please Enter a Valid Choice (1 - 4)");
+                    break;
+            }
+        } while (true);
     }
 
     private static void signUpMenu() {
@@ -49,17 +52,15 @@ public class Main {
         String username;
         char[] password;
         char[] confirmPasswd;
-        // int accountNo;
-        float balance;
+        float balance; // to be removed
         String accountType;
 
         clearScreen();
-        System.out.print("First Name: ");
+        System.out.println("======== Signup Menu ========");
+        System.out.print("Enter First Name: ");
         firstName = input.next();
-        System.out.print("Last Name: ");
+        System.out.print("Enter Last Name: ");
         lastName = input.next();
-        // System.out.print("account no: ");
-        // accountNo = input.nextInt();
         System.out.print("Starting Balance: ");
         balance = input.nextFloat();
         
@@ -84,6 +85,7 @@ public class Main {
                 System.out.println("Passwords don't match, try again!");
             } else {
                 System.out.println("Passwords Match!");
+                enterToContinue();
                 break;
             }
         } while (true);
@@ -92,6 +94,7 @@ public class Main {
         Database.addToCustomers(customer);
         System.out.println("Sign up Successful.");
         System.out.println("Your account number is '" + customer.getAccount(0).getAccountNo() + "'");
+        enterToContinue();
 
         loginMenu();
     }
@@ -110,7 +113,7 @@ public class Main {
             System.out.println("5. My Accounts");
             System.out.println("6. Transaction History");
             System.out.println("7. Settings");
-            System.out.println("7. Logout");
+            System.out.println("8. Logout");
         
             System.out.print("Enter your choice: ");
             choice = input.nextInt();
@@ -119,13 +122,14 @@ public class Main {
                 case 1:
                     System.out.println("Please choose which account you want to check balance.");
                     choice = chooseAccount(customer);
-                    JOptionPane.showMessageDialog(null, "Yor  Account Balance is " + customer.getAccount(choice-1).getBalance());
+                    double accBalance = customer.getAccount(choice-1).getBalance();
+                    JOptionPane.showMessageDialog(null,"Your Account Balance is: " + accBalance);
                     break;
                 case 2:
                     double amount;
                     int accNo;
                     String description;
-                    System.out.println("Please choose account you want to transfer from.");
+                    System.out.println("Please choose the account you want to transfer from.");
                     choice = chooseAccount(customer);
                     System.out.println("Please enter the account you want to transfer to.");
                     accNo = input.nextInt();
@@ -142,9 +146,12 @@ public class Main {
                     System.out.println("Enter description for the transfer.");
                     description = input.next();
                     customer.transferFunds((choice - 1), accNo, amount, description);
+                    System.out.println("Complete.");
+                    enterToContinue();
                     break;
                 case 3:
-                    System.out.println("This Service is yet to be started!");
+                    System.out.println("This Service is yet to be implemented!");
+                    enterToContinue();
                     break;
                 case 4:
                     if (customer.getNoOfAccounts() >= 5) {
@@ -152,19 +159,28 @@ public class Main {
                         break;
                     }
                     String accountType = chooseAccountType();
-                    System.out.print("Enter Strting Balance: ");
+                    System.out.print("Enter Starting Balance: ");
                     double balance = input.nextDouble();
                     customer.createAccount(balance, accountType);
+                    // TODO: display the new account number
+                    System.out.println("Account Created Successfully!");
+                    enterToContinue();
                     break;
                 case 5:
-                    // Display account no and balance
+                    customer.displayAccounts(customer);
+                    enterToContinue();
                     break;
                 case 6:
-                    Transaction[] txn = customer.getTransactions();
+                    ArrayList<Transaction> txn = customer.getTransactions();
                     if (hasTransactions(txn)) {
-                        displayTransactions(customer);
+                        customer.displayTransactions(customer);
+                        enterToContinue();
+                        break;
+                    } else {
+                        System.out.println("You Have No Transactions!");
+                        enterToContinue();
+                        break;
                     }
-                    break;
                 case 7:
                     settingsMenu(customer);
                     break;
@@ -178,16 +194,29 @@ public class Main {
     }    
 
     private static void aboutMenu() {
-
+        clearScreen();
+        System.out.println("About Us: ");
+        System.out.println("    we are third-year computer science students.");
+        System.out.println("Our Team: ");
+        System.out.println("[+] Nahom Anteneh           1404607");
+        System.out.println("[+] Melaku Azene            1405424");
+        System.out.println("[+] Mastewal Loha           1405072");
+        System.out.println("[+] Saba Aregawi            1405440");
+        System.out.println("[+] Samrawit Solomon        1404491");
+        System.out.println("[+] Gerawork Zewdu          1404191");
+        System.out.println("Project Objective: ");
+        System.out.println("    Our project aims to create a user-friendly bank management system that simplifies banking operations");
+        enterToContinue();
     }
 
     private static void loginMenu() {
         String username;
         char[] password;
-        System.out.println("======== Welcome Back to the Login Page =======");
-        System.out.print("Username: ");
+        clearScreen();
+        System.out.println("======== Welcome to the Login Page =======");
+        System.out.print("Enter Username: ");
         username = input.next();
-        System.out.print("Password: ");
+        System.out.print("Enter Password: ");
         password = readPasswordSecurely();
 
         if (Authenticate.authenticate(username, password)) {
@@ -198,13 +227,66 @@ public class Main {
     }
 
     public static void settingsMenu(Customer customer) {
-        System.out.println("======== Sttings ========");
-        System.out.println("1. Change Username");
-        System.out.println("2. Change Password");
-        System.out.println("3. Delete Account");
-        System.out.println("4. Exit");
+        int choice;
+        do {
+            clearScreen();
+            System.out.println("======== Settings ========");
+            System.out.println("1. Change Username");
+            System.out.println("2. Change Password");
+            System.out.println("3. Delete Account");
+            System.out.println("4. Main Menu");
+            System.out.print("Enter your choice: ");
 
-        // Implement the Switch Case
+            choice = input.nextInt();
+            switch (choice) {
+                case 1:
+                    String username;
+                    System.out.print("Enter the new username: ");
+                    username = input.next();
+                    if (username.equals(customer.getUsername())) {
+                        System.out.println("You entered the same username as your current username! username not affected.");
+                        enterToContinue();
+                        break;
+                    } else if (Database.usernameExists(username)) {
+                        System.out.println("This Username is taken. try other username.");
+                        enterToContinue();
+                        break;
+                    } else {
+                        customer.changeUsername(username);
+                        System.out.println("Username changed Logging out. log in with the updated credentials.");
+                        enterToContinue();
+                        logout();
+                        break;
+                    }
+                case 2:
+                    char[] password;
+                    System.out.print("Enter your current password: ");
+                    password = readPasswordSecurely();
+                    if (Arrays.equals(password, Database.getPassword(customer.getUsername()))) {
+                        System.out.print("Enter your new password: ");
+                        password = readPasswordSecurely();
+                        customer.changePassword(password);
+                        System.out.println("Password changed Logging out. log in with the updated credentials.");
+                        enterToContinue();
+                        logout();
+                        break;
+                    } else {
+                        System.out.println("Your password is incorrect!");
+                        enterToContinue();
+                        break;
+                    }
+                case 3:
+                    // TODO: deletion doesn't work
+                    System.out.println("Which account you want to delete?");
+                    choice = chooseAccount(customer);
+                    customer.deleteAccount(customer.getAccount(choice - 1).getAccountNo());
+                    break;
+                case 4:
+                    return;
+                default:
+                    break;
+            }
+        } while (true);
     }
 
     private static char[] readPasswordSecurely() {
@@ -266,23 +348,21 @@ public class Main {
         return accountType;
     }
 
-    private static void displayTransactions(Customer customer) {
-        Transaction[] transactions = new Transaction[10];
-        transactions = customer.getTransactions();
-        int colWidth = 25;
-        Formatter formatter = new Formatter(System.out);
-        formatter.format("%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%-" + colWidth + "s%n", "TransactionID", "FromAccountNo", "ToAccountsNo", "Amount", "Timestamp", "Description");
-
-        formatter.format("%-" + colWidth + "s%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "d%-" + colWidth + "s%n", transactions[0].getTransactionId(), transactions[0].getFromAccountNo(), transactions[0].getToAccountNo(), transactions[0].getAmount(), transactions[0].getTimestamp(), transactions[0].getDescription());
-        formatter.close();
-    }
-
-    private static boolean hasTransactions(Transaction[] transactions) {
+    private static boolean hasTransactions(ArrayList<Transaction> transactions) {
         for (Transaction transaction : transactions) {
             if (transaction != null) {
-                return true; // At least one non-null element found
+                return true;
             }
         }
-        return false; // No non-null elements found
+        return false;
+    }
+
+    private static void enterToContinue() {
+        System.out.print("Press Enter to continue ...");
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
